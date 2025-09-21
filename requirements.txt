@@ -1,6 +1,9 @@
-fastapi
-uvicorn
-opencv-python
-mediapipe
-numpy
-requests
+# Requirements for medimetrics_cv_api
+fastapi==0.100.0
+uvicorn[standard]>=0.23.2
+numpy==1.26.4
+# server-friendly OpenCV build
+opencv-python-headless>=4.7.0
+# mediapipe wheel compatible with Python 3.11 manylinux2014
+mediapipe==0.10.20
+requests>=2.30.0

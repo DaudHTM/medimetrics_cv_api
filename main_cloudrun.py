@@ -1,4 +1,5 @@
 import io
+import os
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 import cv2
@@ -11,19 +12,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# During development allow localhost:3000; in production set to your real origin(s)
-origins = [
-    "https://medimetrics-patient-web.vercel.app",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    # add your production frontend origin(s) here
-]
+# For Cloud Run allow all origins by default; tighten this in production if needed
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,       # or ["*"] for quick dev only
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],         # allow POST, OPTIONS, etc.
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -396,6 +392,11 @@ def process_image_for_face(rectified_img, mm_per_px=None, marker_pts=None, max_n
     return results_out
 
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
 @app.post("/measure-hand")
 async def measure_hand_api(file: UploadFile = File(...)):
     try:
@@ -487,4 +488,5 @@ async def measure_hand_api(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)
